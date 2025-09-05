@@ -1,0 +1,6 @@
+@OpticaApi.WebApi_HostAddress = http://localhost:5057
+
+GET {{OpticaApi.WebApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
