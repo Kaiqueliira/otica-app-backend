@@ -74,4 +74,11 @@ public class GrauLenteRepository : IGrauLenteRepository
         var count = await connection.QuerySingleAsync<int>(sql, new { Id = id });
         return count > 0;
     }
+
+    public async Task<int> GetAllCountAsync()
+    {
+        using var connection = new SqliteConnection(_connectionString);
+        var sql = "SELECT COUNT(*) FROM GrausLentes";
+        return await connection.QueryFirstOrDefaultAsync<int>(sql);
+    }
 }

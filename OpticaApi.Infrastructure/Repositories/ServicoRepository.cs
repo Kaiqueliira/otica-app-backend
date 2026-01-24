@@ -2,6 +2,7 @@
 using Dapper;
 using Microsoft.Data.Sqlite;
 using OpticaApi.Domain.Entities;
+using OpticaApi.Domain.Enums;
 using OpticaApi.Domain.Repositories;
 
 namespace OpticaApi.Infrastructure.Repositories;
@@ -73,5 +74,37 @@ public class ServicoRepository : IServicoRepository
         var sql = "SELECT COUNT(1) FROM Servicos WHERE Id = @Id";
         var count = await connection.QuerySingleAsync<int>(sql, new { Id = id });
         return count > 0;
+    }
+
+    public async Task<int> GetAllCountAsync()
+    {
+        using var connection = new SqliteConnection(_connectionString);
+        var sql = "SELECT COUNT(*) FROM Servicos";
+        return await connection.QueryFirstOrDefaultAsync<int>(sql);
+    }
+
+    public async Task<decimal> GetReceitaMensal()
+    {
+        using var connection = new SqliteConnection(_connectionString);
+        var sql = @"
+        SELECT COALESCE(SUM(valor), 0) 
+        FROM Servicos
+        WHERE strftime('%Y-%m', dataServico) = strftime('%Y-%m', 'now')";
+
+        return await connection.QueryFirstOrDefaultAsync<decimal>(sql);
+    }
+
+    public async Task<int> GetServicoConcluidoHoje()
+    {
+        using var connection = new SqliteConnection(_connectionString);
+        var sql = $"SELECT COUNT(*)FROM Servicos WHERE date(dataServico) = date('now','localtime') AND Status = {Convert.ToInt64(StatusServico.Concluido)};";
+        return await connection.QueryFirstOrDefaultAsync<int>(sql);
+    }
+
+    public async Task<int> GetServicoByStatus(StatusServico status)
+    {
+        using var connection = new SqliteConnection(_connectionString);
+        var sql = $"SELECT COUNT(*)FROM Servicos WHERE Status = {Convert.ToInt64(status)};";
+        return await connection.QueryFirstOrDefaultAsync<int>(sql);
     }
 }

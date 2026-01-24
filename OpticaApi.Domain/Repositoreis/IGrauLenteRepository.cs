@@ -12,4 +12,5 @@ public interface IGrauLenteRepository
     Task UpdateAsync(GrauLente grauLente);
     Task DeleteAsync(int id);
     Task<bool> ExistsAsync(int id);
+    Task<int> GetAllCountAsync();
 }

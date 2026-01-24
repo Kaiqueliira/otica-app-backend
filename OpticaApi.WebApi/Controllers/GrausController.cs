@@ -19,7 +19,7 @@ public class GrausController : ControllerBase
     {
         _grauLenteService = grauLenteService;
     }
-
+ 
     /// <summary>
     /// Lista todos os graus de lentes cadastrados
     /// </summary>

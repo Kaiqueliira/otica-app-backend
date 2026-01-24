@@ -11,4 +11,5 @@ public interface IGrauLenteService
     Task<GrauLenteDto> CreateAsync(CreateGrauLenteDto createGrauLenteDto);
     Task UpdateAsync(int id, CreateGrauLenteDto updateGrauLenteDto);
     Task DeleteAsync(int id);
+    Task<int> GetAllCountAsync();
 }

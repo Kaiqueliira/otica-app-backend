@@ -166,4 +166,9 @@ public class GrauLenteService : IGrauLenteService
 
         await _grauLenteRepository.DeleteAsync(id);
     }
+
+    public async Task<int> GetAllCountAsync()
+    {
+        return await _grauLenteRepository.GetAllCountAsync();
+    }
 }

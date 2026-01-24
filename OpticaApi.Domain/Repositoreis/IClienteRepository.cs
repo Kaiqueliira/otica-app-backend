@@ -11,4 +11,5 @@ public interface IClienteRepository
     Task UpdateAsync(Cliente cliente);
     Task DeleteAsync(int id);
     Task<bool> ExistsAsync(int id);
+    Task<int> GetAllCountAsync();
 }
