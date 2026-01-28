@@ -50,9 +50,9 @@ public class ClienteService : IClienteService
 
     public async Task<ClienteDto> CreateAsync(CreateClienteDto createClienteDto)
     {
-        var clienteExistente = await _clienteRepository.GetByCPFAsync(createClienteDto.CPF);
+     /*   var clienteExistente = await _clienteRepository.GetByCPFAsync(createClienteDto.CPF);
         if (clienteExistente != null)
-            throw new InvalidOperationException("Cliente com este CPF já existe");
+            throw new InvalidOperationException("Cliente com este CPF já existe");*/
 
         var cliente = new Cliente
         {

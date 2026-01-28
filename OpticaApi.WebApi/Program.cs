@@ -2,23 +2,30 @@ using OpticaApi.Application.Services;
 using OpticaApi.Domain.Repositories;
 using OpticaApi.Infrastructure.Database;
 using OpticaApi.Infrastructure.Repositories;
+using System.Diagnostics;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// --------------------
-// Services
-// --------------------
-var connectionString = "Data Source=optica.db";
+const string connectionString =
+    @"Server=(localdb)\MSSQLLocalDB;
+      Database=OpticaApi;
+      Trusted_Connection=True;";
 
-builder.Services.AddSingleton<DatabaseInitializer>(_ =>
-    new DatabaseInitializer(connectionString));
+builder.Services.AddSingleton<DatabaseInitializer>(
+    _ => new DatabaseInitializer(connectionString)
+);
 
-builder.Services.AddScoped<IClienteRepository>(_ =>
-    new ClienteRepository(connectionString));
-builder.Services.AddScoped<IGrauLenteRepository>(_ =>
-    new GrauLenteRepository(connectionString));
-builder.Services.AddScoped<IServicoRepository>(_ =>
-    new ServicoRepository(connectionString));
+builder.Services.AddScoped<IClienteRepository>(
+    _ => new ClienteRepository(connectionString)
+);
+
+builder.Services.AddScoped<IGrauLenteRepository>(
+    _ => new GrauLenteRepository(connectionString)
+);
+
+builder.Services.AddScoped<IServicoRepository>(
+    _ => new ServicoRepository(connectionString)
+);
 
 builder.Services.AddScoped<IClienteService, ClienteService>();
 builder.Services.AddScoped<IGrauLenteService, GrauLenteService>();
@@ -27,44 +34,42 @@ builder.Services.AddScoped<IPainelService, PainelService>();
 
 builder.Services.AddControllers();
 
-// --------------------
-// CORS
-// --------------------
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReact", policy =>
     {
+#if DEBUG
+        policy
+            .WithOrigins("http://localhost:3000")
+            .AllowAnyMethod()
+            .AllowAnyHeader();
+#else
         policy
             .WithOrigins("http://localhost:8080")
             .AllowAnyMethod()
             .AllowAnyHeader();
+#endif
     });
 });
 
-// --------------------
-// Swagger
-// --------------------
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// --------------------
-// Init DB
-// --------------------
 using (var scope = app.Services.CreateScope())
 {
-    var db = scope.ServiceProvider.GetRequiredService<DatabaseInitializer>();
-    await db.InitializeAsync();
+    var dbInitializer =
+        scope.ServiceProvider.GetRequiredService<DatabaseInitializer>();
+
+    await dbInitializer.InitializeAsync();
+
+    var migrator = new DatabaseMigrator(connectionString);
+    await migrator.MigrateAsync();
 }
 
-// --------------------
-// Pipeline (ORDEM IMPORTA)
-// --------------------
 app.UseRouting();
-
 app.UseCors("AllowReact");
-
 app.MapControllers();
 
 app.Run();

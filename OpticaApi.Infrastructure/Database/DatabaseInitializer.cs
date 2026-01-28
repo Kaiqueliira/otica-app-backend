@@ -1,7 +1,6 @@
-﻿// OpticaApi.Infrastructure/Database/DatabaseInitializer.cs
-using System.Data;
+﻿using System.Data;
 using Dapper;
-using Microsoft.Data.Sqlite;
+using Microsoft.Data.SqlClient;
 
 namespace OpticaApi.Infrastructure.Database;
 
@@ -16,53 +15,82 @@ public class DatabaseInitializer
 
     public async Task InitializeAsync()
     {
-        using var connection = new SqliteConnection(_connectionString);
+        await CreateDatabaseIfNotExists();
+
+        using var connection = new SqlConnection(_connectionString);
         await connection.OpenAsync();
 
         await CreateTablesAsync(connection);
+
+    }
+
+    private async Task CreateDatabaseIfNotExists()
+    {
+        var masterConnectionString = _connectionString.Replace("Database=OpticaApi;", "Database=master;");
+
+        using var connection = new SqlConnection(masterConnectionString);
+        await connection.OpenAsync();
+
+        var sql = @"
+        IF DB_ID('OpticaApi') IS NULL
+        BEGIN
+            CREATE DATABASE OpticaApi;
+        END";
+
+        await connection.ExecuteAsync(sql);
     }
 
     private async Task CreateTablesAsync(IDbConnection connection)
     {
-        var createTables = @"
-            CREATE TABLE IF NOT EXISTS Clientes (
-                Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                Nome TEXT NOT NULL,
-                CPF TEXT NOT NULL UNIQUE,
-                Email TEXT,
-                Telefone TEXT,
-                Endereco TEXT,
-                DataNascimento TEXT NOT NULL,
-                DataCadastro TEXT NOT NULL
+        var sql = @"
+        IF NOT EXISTS (SELECT 1 FROM sys.tables WHERE name = 'Clientes')
+        BEGIN
+           CREATE TABLE Clientes (
+                Id BIGINT IDENTITY(1,1) PRIMARY KEY,
+                Nome NVARCHAR(200) NOT NULL,
+                CPF NVARCHAR(14) NULL,      
+                Email NVARCHAR(200),
+                Telefone NVARCHAR(20),
+                Endereco NVARCHAR(300),
+                DataNascimento DATE NOT NULL,
+                DataCadastro DATETIME2 NOT NULL);
+        END
+
+        IF NOT EXISTS (SELECT 1 FROM sys.tables WHERE name = 'GrausLentes')
+        BEGIN
+            CREATE TABLE GrausLentes (
+                Id BIGINT IDENTITY(1,1) PRIMARY KEY,
+                ClienteId BIGINT NOT NULL,
+                EsfericoOD DECIMAL(6,2) NOT NULL,
+                CilindricoOD DECIMAL(6,2) NOT NULL,
+                EixoOD INT NOT NULL,
+                DPOD DECIMAL(6,2) NOT NULL,
+                EsfericoOE DECIMAL(6,2) NOT NULL,
+                CilindricoOE DECIMAL(6,2) NOT NULL,
+                EixoOE INT NOT NULL,
+                DPOE DECIMAL(6,2) NOT NULL,
+                Observacoes NVARCHAR(500),
+                DataReceita DATE NOT NULL,
+                CONSTRAINT FK_GrausLentes_Clientes
+                    FOREIGN KEY (ClienteId) REFERENCES Clientes(Id)
             );
+        END
 
-            CREATE TABLE IF NOT EXISTS GrausLentes (
-                Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                ClienteId INTEGER NOT NULL,
-                EsfericoOD REAL NOT NULL,
-                CilindricoOD REAL NOT NULL,
-                EixoOD INTEGER NOT NULL,
-                DPOD REAL NOT NULL,
-                EsfericoOE REAL NOT NULL,
-                CilindricoOE REAL NOT NULL,
-                EixoOE INTEGER NOT NULL,
-                DPOE REAL NOT NULL,
-                Observacoes TEXT,
-                DataReceita TEXT NOT NULL,
-                FOREIGN KEY (ClienteId) REFERENCES Clientes (Id)
+        IF NOT EXISTS (SELECT 1 FROM sys.tables WHERE name = 'Servicos')
+        BEGIN
+            CREATE TABLE Servicos (
+                Id BIGINT IDENTITY(1,1) PRIMARY KEY,
+                ClienteId BIGINT NOT NULL,
+                TipoServico INT NOT NULL,
+                Descricao NVARCHAR(300) NOT NULL,
+                Valor DECIMAL(10,2) NOT NULL,
+                DataServico DATE NOT NULL,
+                Status INT NOT NULL,
+                CONSTRAINT FK_Servicos_Clientes
+                    FOREIGN KEY (ClienteId) REFERENCES Clientes(Id)
             );
+        END";
 
-            CREATE TABLE IF NOT EXISTS Servicos (
-                Id INTEGER PRIMARY KEY AUTOINCREMENT,
-                ClienteId INTEGER NOT NULL,
-                TipoServico INTEGER NOT NULL,
-                Descricao TEXT NOT NULL,
-                Valor REAL NOT NULL,
-                DataServico TEXT NOT NULL,
-                Status INTEGER NOT NULL,
-                FOREIGN KEY (ClienteId) REFERENCES Clientes (Id)
-            );";
-
-        await connection.ExecuteAsync(createTables);
+        await connection.ExecuteAsync(sql);
     }
 }

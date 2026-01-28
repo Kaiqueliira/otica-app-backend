@@ -1,6 +1,5 @@
-﻿// OpticaApi.Infrastructure/Repositories/ClienteRepository.cs
-using Dapper;
-using Microsoft.Data.Sqlite;
+﻿using Dapper;
+using Microsoft.Data.SqlClient;
 using OpticaApi.Domain.Entities;
 using OpticaApi.Domain.Repositories;
 
@@ -17,85 +16,84 @@ public class ClienteRepository : IClienteRepository
 
     public async Task<Cliente> GetByIdAsync(int id)
     {
-        using var connection = new SqliteConnection(_connectionString);
-
-        var sql = @"SELECT Id, Nome, CPF, Email, Telefone, Endereco, 
-                           DataNascimento, DataCadastro 
-                    FROM Clientes WHERE Id = @Id";
-
+        using var connection = new SqlConnection(_connectionString);
+        var sql = @"
+            SELECT Id, Nome, CPF, Email, Telefone, Endereco, 
+                   DataNascimento, DataCadastro 
+            FROM Clientes 
+            WHERE Id = @Id";
         return await connection.QueryFirstOrDefaultAsync<Cliente>(sql, new { Id = id });
     }
 
     public async Task<IEnumerable<Cliente>> GetAllAsync()
     {
-        using var connection = new SqliteConnection(_connectionString);
-
-        var sql = @"SELECT Id, Nome, CPF, Email, Telefone, Endereco, 
-                           DataNascimento, DataCadastro 
-                    FROM Clientes ORDER BY Nome";
-
+        using var connection = new SqlConnection(_connectionString);
+        var sql = @"
+            SELECT Id, Nome, CPF, Email, Telefone, Endereco, 
+                   DataNascimento, DataCadastro 
+            FROM Clientes 
+            ORDER BY Nome";
         return await connection.QueryAsync<Cliente>(sql);
     }
 
     public async Task<Cliente> GetByCPFAsync(string cpf)
     {
-        using var connection = new SqliteConnection(_connectionString);
-
-        var sql = @"SELECT Id, Nome, CPF, Email, Telefone, Endereco, 
-                           DataNascimento, DataCadastro 
-                    FROM Clientes WHERE CPF = @CPF";
-
+        using var connection = new SqlConnection(_connectionString);
+        var sql = @"
+            SELECT Id, Nome, CPF, Email, Telefone, Endereco, 
+                   DataNascimento, DataCadastro 
+            FROM Clientes 
+            WHERE CPF = @CPF";
         return await connection.QueryFirstOrDefaultAsync<Cliente>(sql, new { CPF = cpf });
     }
 
     public async Task<int> CreateAsync(Cliente cliente)
     {
-        using var connection = new SqliteConnection(_connectionString);
-
-        var sql = @"INSERT INTO Clientes (Nome, CPF, Email, Telefone, Endereco, DataNascimento, DataCadastro)
-                    VALUES (@Nome, @CPF, @Email, @Telefone, @Endereco, @DataNascimento, @DataCadastro);
-                    SELECT last_insert_rowid();";
+        using var connection = new SqlConnection(_connectionString);
+        var sql = @"
+            INSERT INTO Clientes 
+                (Nome, CPF, Email, Telefone, Endereco, DataNascimento, DataCadastro)
+            VALUES 
+                (@Nome, @CPF, @Email, @Telefone, @Endereco, @DataNascimento, @DataCadastro);
+            
+            -- SQL Server: retorna o Id gerado
+            SELECT CAST(SCOPE_IDENTITY() AS INT);";
 
         return await connection.QuerySingleAsync<int>(sql, cliente);
     }
 
     public async Task UpdateAsync(Cliente cliente)
     {
-        using var connection = new SqliteConnection(_connectionString);
-
-        var sql = @"UPDATE Clientes SET 
-                        Nome = @Nome, 
-                        Email = @Email, 
-                        Telefone = @Telefone, 
-                        Endereco = @Endereco
-                    WHERE Id = @Id";
-
+        using var connection = new SqlConnection(_connectionString);
+        var sql = @"
+            UPDATE Clientes SET 
+                Nome = @Nome, 
+                Email = @Email, 
+                Telefone = @Telefone, 
+                Endereco = @Endereco
+            WHERE Id = @Id";
         await connection.ExecuteAsync(sql, cliente);
     }
 
     public async Task DeleteAsync(int id)
     {
-        using var connection = new SqliteConnection(_connectionString);
-
+        using var connection = new SqlConnection(_connectionString);
         var sql = "DELETE FROM Clientes WHERE Id = @Id";
-
         await connection.ExecuteAsync(sql, new { Id = id });
     }
 
     public async Task<bool> ExistsAsync(int id)
     {
-        using var connection = new SqliteConnection(_connectionString);
-
+        using var connection = new SqlConnection(_connectionString);
         var sql = "SELECT COUNT(1) FROM Clientes WHERE Id = @Id";
-
         var count = await connection.QuerySingleAsync<int>(sql, new { Id = id });
         return count > 0;
     }
 
     public async Task<int> GetAllCountAsync()
     {
-        using var connection = new SqliteConnection(_connectionString);
-        var sql = @"SELECT count(*) FROM Clientes";
+        using var connection = new SqlConnection(_connectionString);
+        var sql = "SELECT COUNT(*) FROM Clientes";
         return await connection.QueryFirstOrDefaultAsync<int>(sql);
     }
 }
