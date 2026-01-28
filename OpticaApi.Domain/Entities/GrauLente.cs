@@ -13,4 +13,6 @@ public class GrauLente
     public decimal DPOE { get; set; }
     public string Observacoes { get; set; }
     public DateTime DataReceita { get; set; }
+    public decimal AdicaoOD { get; set; }
+    public decimal AdicaoOE { get; set; }
 }

@@ -32,10 +32,12 @@ public class GrauLenteService : IGrauLenteService
             CilindricoOD = grauLente.CilindricoOD,
             EixoOD = grauLente.EixoOD,
             DPOD = grauLente.DPOD,
+            AdicaoOD = grauLente.AdicaoOD,          // novo campo
             EsfericoOE = grauLente.EsfericoOE,
             CilindricoOE = grauLente.CilindricoOE,
             EixoOE = grauLente.EixoOE,
             DPOE = grauLente.DPOE,
+            AdicaoOE = grauLente.AdicaoOE,          // novo campo
             Observacoes = grauLente.Observacoes,
             DataReceita = grauLente.DataReceita
         };
@@ -58,10 +60,12 @@ public class GrauLenteService : IGrauLenteService
                 CilindricoOD = grau.CilindricoOD,
                 EixoOD = grau.EixoOD,
                 DPOD = grau.DPOD,
+                AdicaoOD = grau.AdicaoOD,
                 EsfericoOE = grau.EsfericoOE,
                 CilindricoOE = grau.CilindricoOE,
                 EixoOE = grau.EixoOE,
                 DPOE = grau.DPOE,
+                AdicaoOE = grau.AdicaoOE,
                 Observacoes = grau.Observacoes,
                 DataReceita = grau.DataReceita
             });
@@ -84,10 +88,12 @@ public class GrauLenteService : IGrauLenteService
             CilindricoOD = g.CilindricoOD,
             EixoOD = g.EixoOD,
             DPOD = g.DPOD,
+            AdicaoOD = g.AdicaoOD,
             EsfericoOE = g.EsfericoOE,
             CilindricoOE = g.CilindricoOE,
             EixoOE = g.EixoOE,
             DPOE = g.DPOE,
+            AdicaoOE = g.AdicaoOE,
             Observacoes = g.Observacoes,
             DataReceita = g.DataReceita
         });
@@ -95,7 +101,6 @@ public class GrauLenteService : IGrauLenteService
 
     public async Task<GrauLenteDto> CreateAsync(CreateGrauLenteDto createGrauLenteDto)
     {
-        // Verificar se cliente existe
         var clienteExists = await _clienteRepository.ExistsAsync(createGrauLenteDto.ClienteId);
         if (!clienteExists)
             throw new InvalidOperationException("Cliente não encontrado");
@@ -107,10 +112,12 @@ public class GrauLenteService : IGrauLenteService
             CilindricoOD = createGrauLenteDto.CilindricoOD,
             EixoOD = createGrauLenteDto.EixoOD,
             DPOD = createGrauLenteDto.DPOD,
+            AdicaoOD = createGrauLenteDto.AdicaoOD,        
             EsfericoOE = createGrauLenteDto.EsfericoOE,
             CilindricoOE = createGrauLenteDto.CilindricoOE,
             EixoOE = createGrauLenteDto.EixoOE,
             DPOE = createGrauLenteDto.DPOE,
+            AdicaoOE = createGrauLenteDto.AdicaoOE,        
             Observacoes = createGrauLenteDto.Observacoes ?? string.Empty,
             DataReceita = createGrauLenteDto.DataReceita
         };
@@ -129,10 +136,12 @@ public class GrauLenteService : IGrauLenteService
             CilindricoOD = grauLente.CilindricoOD,
             EixoOD = grauLente.EixoOD,
             DPOD = grauLente.DPOD,
+            AdicaoOD = grauLente.AdicaoOD,
             EsfericoOE = grauLente.EsfericoOE,
             CilindricoOE = grauLente.CilindricoOE,
             EixoOE = grauLente.EixoOE,
             DPOE = grauLente.DPOE,
+            AdicaoOE = grauLente.AdicaoOE,
             Observacoes = grauLente.Observacoes,
             DataReceita = grauLente.DataReceita
         };
@@ -148,10 +157,12 @@ public class GrauLenteService : IGrauLenteService
         grauLente.CilindricoOD = updateGrauLenteDto.CilindricoOD;
         grauLente.EixoOD = updateGrauLenteDto.EixoOD;
         grauLente.DPOD = updateGrauLenteDto.DPOD;
+        grauLente.AdicaoOD = updateGrauLenteDto.AdicaoOD;        // novo campo
         grauLente.EsfericoOE = updateGrauLenteDto.EsfericoOE;
         grauLente.CilindricoOE = updateGrauLenteDto.CilindricoOE;
         grauLente.EixoOE = updateGrauLenteDto.EixoOE;
         grauLente.DPOE = updateGrauLenteDto.DPOE;
+        grauLente.AdicaoOE = updateGrauLenteDto.AdicaoOE;        // novo campo
         grauLente.Observacoes = updateGrauLenteDto.Observacoes ?? string.Empty;
         grauLente.DataReceita = updateGrauLenteDto.DataReceita;
 

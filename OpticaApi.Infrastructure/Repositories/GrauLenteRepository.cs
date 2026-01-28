@@ -41,12 +41,12 @@ public class GrauLenteRepository : IGrauLenteRepository
         var sql = @"
             INSERT INTO GrausLentes 
                 (ClienteId, EsfericoOD, CilindricoOD, EixoOD, DPOD, 
-                 EsfericoOE, CilindricoOE, EixoOE, DPOE, Observacoes, DataReceita)
+                 EsfericoOE, CilindricoOE, EixoOE, DPOE, Observacoes, DataReceita, AdicaoOe, AdicaoOd)
             VALUES 
                 (@ClienteId, @EsfericoOD, @CilindricoOD, @EixoOD, @DPOD, 
-                 @EsfericoOE, @CilindricoOE, @EixoOE, @DPOE, @Observacoes, @DataReceita);
+                 @EsfericoOE, @CilindricoOE, @EixoOE, @DPOE, @Observacoes, @DataReceita, @AdicaoOe, @AdicaoOd);
 
-            SELECT CAST(SCOPE_IDENTITY() AS INT);"; // SQL Server
+            SELECT CAST(SCOPE_IDENTITY() AS INT);"; 
         return await connection.QuerySingleAsync<int>(sql, grauLente);
     }
 
@@ -64,7 +64,9 @@ public class GrauLenteRepository : IGrauLenteRepository
                 EixoOE = @EixoOE, 
                 DPOE = @DPOE,
                 Observacoes = @Observacoes, 
-                DataReceita = @DataReceita
+                DataReceita = @DataReceita,
+                AdicaoOe = @AdicaoOe,
+                AdicaoOd = @AdicaoOd
             WHERE Id = @Id";
         await connection.ExecuteAsync(sql, grauLente);
     }

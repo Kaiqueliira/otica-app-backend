@@ -45,6 +45,12 @@ public class GrauLenteDto
 
     [SwaggerSchema("Data da receita médica")]
     public DateTime DataReceita { get; set; }
+
+    [SwaggerSchema("Grau de adição olho direito")]
+    public decimal AdicaoOD { get; set; }
+
+    [SwaggerSchema("Grau de adição olho esquerdo")]
+    public decimal AdicaoOE { get; set; }
 }
 
 [SwaggerSchema("Dados para criação de um novo grau de lente")]
@@ -138,4 +144,20 @@ public class CreateGrauLenteDto
     [Required(ErrorMessage = "Data da receita é obrigatória")]
     [SwaggerSchema("Data da receita médica")]
     public DateTime DataReceita { get; set; }
+
+    /// <summary>
+    /// Grau de adição olho direito
+    /// </summary>
+    /// <example>2.0</example>
+    [Range(0, 180, ErrorMessage = "Adição OD deve estar entre 0 e 5")]
+    [SwaggerSchema("Grau de adição do olho direito (0 a 5)")]
+    public decimal AdicaoOD { get; set; }
+
+    /// <summary>
+    /// Grau de adição olho esquerdo
+    /// </summary>
+    /// <example>2.0</example>
+    [Range(0, 180, ErrorMessage = "Adição OE deve estar entre 0 e 5")]
+    [SwaggerSchema("Grau de adição do olho esquerdo (0 a 5)")]
+    public decimal AdicaoOE { get; set; }
 }
